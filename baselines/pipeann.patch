@@ -1,0 +1,81 @@
+--- a/src/utils/index_build_utils.cpp
++++ b/src/utils/index_build_utils.cpp
+@@ -201,8 +201,11 @@ namespace pipeann {
+         attr_writer->write((uint32_t) global_id, node.attrs);
+       }
+
++      // Clear only the bits that this node set. Assigning nnodes bits per node makes the merge quadratic in the vectors.
+       for (size_t i = 0; i < NHOOD_TYPE_CNT; i++) {
+-        nhood_set[i].assign(nnodes, false);
++        for (auto v : nhood[i]) {
++          nhood_set[i][v] = false;
++        }
+         nhood[i].clear();
+       }
+     };
+@@ -301,8 +304,22 @@ namespace pipeann {
+     }
+ 
+     std::string merged_index_prefix = disk_index_path + "_tempFiles";
+-    int num_parts =
+-        partition_with_ram_budget<T>(base_file, sampling_rate, ram_budget, 2 * R / 3, merged_index_prefix, 2);
++    // With BUILD_RESUME_SHARDS set, a stopped build keeps its partition and its saved shards. A saved shard has its tags file,
++    // which is written after the index file.
++    int num_parts;
++    if (getenv("BUILD_RESUME_SHARDS")) {
++      num_parts = 0;
++      while (file_exists(merged_index_prefix + "_subshard-" + std::to_string(num_parts) + "_ids_uint32.bin")) {
++        num_parts++;
++      }
++      LOG(INFO) << "BUILD_RESUME_SHARDS: reusing " << num_parts << " shards";
++      if (num_parts == 0) {
++        LOG(ERROR) << "BUILD_RESUME_SHARDS set but no shard id files found under " << merged_index_prefix;
++        exit(-1);
++      }
++    } else {
++      num_parts = partition_with_ram_budget<T>(base_file, sampling_rate, ram_budget, 2 * R / 3, merged_index_prefix, 2);
++    }
+ 
+     // Keep shard/final R_ood proportions consistent (shard_R = 2*R/3, so shard_R_ood = 2*R_ood/3).
+     const uint16_t shard_R_ood = (uint16_t) (2 * (uint32_t) R_ood / 3);
+@@ -311,6 +328,10 @@ namespace pipeann {
+       std::string shard_base_file = merged_index_prefix + "_subshard-" + std::to_string(p) + ".bin";
+       std::string shard_disk_file = merged_index_prefix + "_subshard-" + std::to_string(p) + "_disk.index";
+ 
++      if (getenv("BUILD_RESUME_SHARDS") && file_exists(shard_disk_file + ".tags")) {
++        continue;
++      }
++
+       pipeann::IndexBuildParameters paras;
+       paras.set(2 * R / 3, L_or_L1, 750, 1.2, num_threads, false);
+       uint64_t shard_base_dim, shard_base_pts;
+--- a/tests/search_disk_index_filtered.cpp
++++ b/tests/search_disk_index_filtered.cpp
+@@ -1,4 +1,6 @@
+ #include <cstring>
++#include <cstdlib>
++#include <fstream>
+ #include <omp.h>
+ #include <ssd_index.h>
+ #include <iomanip>
+@@ -210,6 +212,20 @@
+     run_tests(test_id, true);
+   }
+
++  // With PF_RESULT_PREFIX set, write the result ids and distances of each L after all timed passes, so that recall can be
++  // computed with ties counted. Search and timing are unchanged.
++  if (const char *rp = std::getenv("PF_RESULT_PREFIX")) {
++    for (uint32_t test_id = 0; test_id < Lvec.size(); test_id++) {
++      std::string fn = std::string(rp) + "_L" + std::to_string(Lvec[test_id]) + ".bin";
++      std::ofstream out(fn, std::ios::binary);
++      int32_t hdr[2] = {(int32_t) query_num, (int32_t) recall_at};
++      out.write((const char *) hdr, sizeof(hdr));
++      out.write((const char *) query_result_tags[test_id].data(), sizeof(uint32_t) * query_num * recall_at);
++      out.write((const char *) query_result_dists[test_id].data(), sizeof(float) * query_num * recall_at);
++      if (!out) { std::cerr << "failed to write " << fn << std::endl; return 1; }
++    }
++  }
++
+   // Selector + base_stores are leaked; OS reclaims at process exit.
+   return 0;
+ }

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="940" height="334" viewBox="0 0 940 334" role="img" aria-labelledby="t">
+  <title id="t">A query and its filter go to the postings, which give the match count before any read. The count picks a row of the plan. The row sets the route and the pool of PQ codes to rank in memory. Reads go from the best estimate down and stop once no unread candidate is likely to beat the k-th best.</title>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: #15161A; }
+    .h { font-size: 14px; font-weight: 600; }
+    .s { font-size: 12.5px; }
+    .m { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+    .band { font-size: 12px; font-weight: 600; fill: #A85D00; letter-spacing: 0.04em; }
+    .box { fill: #FFFFFF; stroke: #B5B7BB; stroke-width: 1.2; }
+    .row { fill: #FBF0E1; }
+    .arrow { stroke: #A85D00; stroke-width: 1.6; fill: none; marker-end: url(#a); }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #EDEDEB; }
+      .band { fill: #F0A43A; }
+      .box { fill: #1C1D21; stroke: #4B4E54; }
+      .row { fill: #2C2316; }
+      .bg { fill: #121316; stroke: #2B2D31; }
+      .bg2 { fill: #17181B; stroke: #2B2D31; }
+      .arrow { stroke: #F0A43A; }
+      #a path { fill: #F0A43A; }
+    }
+  </style>
+  <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#A85D00"/></marker></defs>
+
+  <rect class="bg" x="8" y="8" width="924" height="216" rx="10" fill="#F6F6F4" stroke="#E3E3E0"/>
+  <text class="band" x="24" y="30">IN MEMORY</text>
+  <rect class="bg2" x="408" y="236" width="524" height="90" rx="10" fill="#F3F3F1" stroke="#E3E3E0"/>
+  <text class="band" x="424" y="254">ON THE SSD</text>
+
+  <rect class="box" x="24" y="44" width="172" height="164" rx="8"/>
+  <text class="h" x="38" y="68">Query and filter</text>
+  <text class="s" x="38" y="92">"kitchen items &lt; $50"</text>
+  <text class="m" x="38" y="122">AND 2</text>
+  <text class="m" x="50" y="140">L 7</text>
+  <text class="m" x="50" y="158">R price 0 5000</text>
+
+  <rect class="box" x="226" y="44" width="162" height="164" rx="8"/>
+  <text class="h" x="240" y="68">1. Count</text>
+  <text class="s" x="240" y="92">Postings sorted by</text>
+  <text class="s" x="240" y="109">position give the</text>
+  <text class="s" x="240" y="126">match count before</text>
+  <text class="s" x="240" y="143">the first read.</text>
+  <text class="m" x="240" y="180">31,204 matches</text>
+
+  <rect class="box" x="418" y="44" width="240" height="164" rx="8"/>
+  <text class="h" x="432" y="68">2. Plan</text>
+  <text class="s" x="432" y="92">Calibrated per recall target.</text>
+  <text class="s" x="432" y="116">count</text><text class="s" x="492" y="116">route</text><text class="s" x="586" y="116">pool</text>
+  <text class="m" x="432" y="136">&lt; 3K</text><text class="m" x="492" y="136">all matches</text><text class="m" x="586" y="136">64</text>
+  <rect class="row" x="426" y="143" width="226" height="21" rx="4"/>
+  <text class="m" x="432" y="158">&lt; 100K</text><text class="m" x="492" y="158">all matches</text><text class="m" x="586" y="158">192</text>
+  <text class="m" x="432" y="182">more</text><text class="m" x="492" y="182">2,048 parts</text><text class="m" x="586" y="182">256</text>
+
+  <rect class="box" x="688" y="44" width="228" height="164" rx="8"/>
+  <text class="h" x="702" y="68">3. Rank</text>
+  <text class="s" x="702" y="92">PQ codes estimate each</text>
+  <text class="s" x="702" y="109">distance on the chosen route.</text>
+  <text class="s" x="702" y="126">The best estimates form</text>
+  <text class="s" x="702" y="143">the pool.</text>
+  <text class="m" x="702" y="180">192 candidates</text>
+
+  <rect class="box" x="424" y="262" width="492" height="54" rx="8"/>
+  <text class="h" x="438" y="294">4. Read and stop</text>
+  <text class="s" x="570" y="284">One 4 KiB read per candidate, best estimate first.</text>
+  <text class="s" x="570" y="303">Stop once the rest is unlikely to beat the k-th best.</text>
+  <text class="h" x="212" y="294">Top k answers</text>
+
+  <path class="arrow" d="M196 126 H224"/>
+  <path class="arrow" d="M388 126 H416"/>
+  <path class="arrow" d="M658 126 H686"/>
+  <path class="arrow" d="M802 208 V260"/>
+  <path class="arrow" d="M424 289 H316"/>
+</svg>
