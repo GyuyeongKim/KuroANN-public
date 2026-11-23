@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KuroANN demo</title>
+<link rel="stylesheet" href="app.css?v=b0337ce264">
+<script>
+try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<div class="band">
+<div class="page">
+
+<header class="masthead">
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 220 220" aria-hidden="true"><rect x="10" y="10" width="200" height="200" rx="36" fill="#2a2b30"/><g transform="translate(46 54)"><rect width="128" height="22" rx="5" fill="#5c5f66"/><rect width="52" height="22" rx="5" fill="#f0a43a"/><rect y="45" width="128" height="22" rx="5" fill="#5c5f66"/><rect y="45" width="88" height="22" rx="5" fill="#f0a43a"/><rect y="90" width="128" height="22" rx="5" fill="#5c5f66"/><rect y="90" width="26" height="22" rx="5" fill="#f0a43a"/></g></svg>
+    <span class="wordmark" data-sys></span>
+    <span class="tag" data-i18n="tag"></span>
+  </div>
+  <div class="mast-right">
+    <a class="link" href="https://github.com/GyuyeongKim/KuroANN-public">GitHub</a>
+    <button id="lang" class="link" type="button"></button>
+    <button id="theme" class="link" type="button"></button>
+  </div>
+</header>
+
+<section class="lede">
+  <h1 data-i18n="h1"></h1>
+  <p data-i18n="lede"></p>
+</section>
+
+<section class="glance" id="glance"></section>
+</div>
+</div>
+
+<div class="page">
+
+<nav class="tabs" role="tablist" id="tabs">
+  <button role="tab" data-tab="search" data-i18n="tabSearch" type="button"></button>
+  <button role="tab" data-tab="rec" data-i18n="tabRec" type="button"></button>
+  <button role="tab" data-tab="rag" data-i18n="tabRag" type="button"></button>
+</nav>
+
+<p class="tab-lede" id="tab-lede"></p>
+
+<section class="shop" id="shop" hidden>
+  <span class="label" data-i18n="shopAs"></span>
+  <div class="shoppers" id="shoppers"></div>
+  <div class="shop-body">
+    <aside class="facets" id="facets" aria-label="Filters"></aside>
+    <div class="shop-main">
+      <div class="shop-bar" id="shop-bar"></div>
+      <div class="speed" id="speed">
+        <div class="speed-head">
+          <span class="label" data-i18n="speedH"></span>
+          <div class="seg" id="targets3" role="radiogroup"></div>
+        </div>
+        <div class="speed-rows" id="speed-rows"></div>
+        <p class="lead" id="shop-lead" hidden></p>
+        <p class="speed-how" id="speed-how"></p>
+      </div>
+      <ol class="results-list items" id="shop-results"></ol>
+      <p class="results-note" data-i18n="resultsRecNote"></p>
+    </div>
+  </div>
+</section>
+
+<main class="grid" id="grid">
+  <section class="ask">
+    <span class="label" id="pick-label"></span>
+    <div class="examples" id="examples"></div>
+  </section>
+  <section class="run" id="run" aria-live="polite">
+    <div class="head" id="run-head"></div>
+    <div class="control" id="load-control" hidden>
+      <span class="label" data-i18n="loadLabel"></span>
+      <div class="seg" id="loads" role="radiogroup"></div>
+      <p class="load-note" id="load-note"></p>
+    </div>
+    <div class="mech" id="mech" hidden></div>
+    <ol class="steps" id="steps"></ol>
+    <div class="control" id="target-control">
+      <span class="label" data-i18n="targetLabel"></span>
+      <div class="seg" id="targets" role="radiogroup"></div>
+    </div>
+    <div class="race" id="race" hidden></div>
+    <div class="compare-wrap"><table class="compare" id="compare"></table></div>
+    <div class="answer" id="answer" hidden></div>
+    <p class="foot" id="rag-foot" hidden></p>
+  </section>
+</main>
+
+<section class="results" id="results-section">
+  <h2 id="results-h"></h2>
+  <ol class="results-list" id="results"></ol>
+  <p class="results-note" id="results-note" hidden></p>
+</section>
+
+<section class="capacity" id="capacity">
+  <h2 data-i18n="capH"></h2>
+  <p class="cap-lede" data-i18n="capLede"></p>
+  <div class="control">
+    <span class="label" data-i18n="targetLabel"></span>
+    <div class="seg" id="targets2" role="radiogroup"></div>
+  </div>
+  <p class="lead cap-lead" id="cap-head"></p>
+  <div class="cap-chart" id="cap-chart"></div>
+  <div class="legend" id="cap-legend"></div>
+  <p class="foot" id="cap-foot"></p>
+</section>
+
+<footer class="footer" id="footer"></footer>
+</div>
+<script src="app.js?v=5dd3a05b95"></script>
+</body>
+</html>
