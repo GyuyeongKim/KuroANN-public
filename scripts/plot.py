@@ -15,15 +15,15 @@ import sys
 from collections import defaultdict
 
 import matplotlib
+import matplotlib.ticker
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import numpy as np
 
 DATASETS = [("pubmed", "PubMed-24M"), ("amazon", "Amazon-35M")]
 BANDS = ["<0.01%", "0.01–0.1%", "0.1–1%", "1–5%", "5–20%", ">20%"]
 TARGETS = ["90", "95", "99"]
-SYSTEMS = {"kuroann": ("KuroANN", "#0062CC", "o", "-"), "pipeann-filter": ("PipeANN-Filter", "#C05A8A", "s", "--"), "faiss-ssd": ("Faiss-SSD", "#7F7F7F", "D", ":")}
+SYSTEMS = {"kuroann": ("KuroANN", "#E08A1E", ""), "pipeann-filter": ("PipeANN-Filter", "#2B2D31", ""), "faiss-ssd": ("Faiss-SSD", "#9AA0A8", "")}
 
 
 def bands_of(path):
@@ -65,7 +65,9 @@ def summarize(directory):
 def main():
     results = sys.argv[1]
     present = [(key, title) for key, title in DATASETS if os.path.exists(f"{results}/{key}/kuroann.jsonl")]
-    fig, axes = plt.subplots(len(present), 3, figsize=(12, 2.6 * len(present)), squeeze=False, sharex=True)
+    plt.rcParams.update({"font.family": ["Helvetica", "Arial", "DejaVu Sans"], "svg.fonttype": "path"})
+    fig, axes = plt.subplots(len(present), 3, figsize=(12, 2.9 * len(present)), squeeze=False, sharex=True, sharey="row")
+    width = 0.27
     with open(f"{results}/summary.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["dataset", "band", "target", "kuroann_recall", "kuroann_qps", "pipeann_filter_qps", "faiss_ssd_qps"])
@@ -75,25 +77,43 @@ def main():
                 values = [row.get(s) for s in ("pipeann-filter", "faiss-ssd")]
                 w.writerow([key, row["band"], row["target"], f"{row['recall']:.4f}", f"{row['kuroann']:.0f}"] + ["" if v is None else f"{v:.0f}" for v in values])
                 print(key, row["band"], row["target"], f"recall {row['recall']:.4f} KuroANN {row['kuroann']:.0f}", values, flush=True)
+            low = min(v for r in rows for v in [r["kuroann"]] + [r.get(s) for s in ("pipeann-filter", "faiss-ssd")] if v)
+            high = max(r["kuroann"] for r in rows)
             for j, target in enumerate(TARGETS):
                 ax = axes[i][j]
                 part = [r for r in rows if r["target"] == target]
-                x = [r["band_index"] for r in part]
-                for system, (label, color, marker, line) in SYSTEMS.items():
-                    y = [r["kuroann"] if system == "kuroann" else r.get(system) for r in part]
-                    ax.plot(x, [np.nan if v is None else v for v in y], color=color, marker=marker, linestyle=line, label=label, linewidth=1.6, markersize=5)
+                for k, (system, (label, color, _)) in enumerate(SYSTEMS.items()):
+                    if system != "kuroann" and not any(system in r for r in part):   # not measured in this run
+                        continue
+                    for r in part:
+                        x = r["band_index"] + (k - 1) * width
+                        v = r["kuroann"] if system == "kuroann" else r.get(system)
+                        if v is None:   # no setting of this system reached KuroANN's recall in this band
+                            ax.plot([x], [low / 1.6], marker="x", color=color, markersize=6, markeredgewidth=1.6, clip_on=False, zorder=4)
+                        else:
+                            ax.bar([x], [v], width, color=color, edgecolor="white", linewidth=0.4, zorder=3,
+                                   label=label if r is part[0] else None)
                 ax.set_yscale("log")
-                ax.grid(True, which="major", color="#E3E6EA", linewidth=0.6)
-                ax.set_title(f"{title}, recall {int(target) / 100:.2f}", fontsize=10)
+                ax.set_ylim(low / 2, high * 1.6)
+                ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:,.0f}"))
+                ax.yaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+                ax.grid(True, axis="y", which="major", color="#E3E3E0", linewidth=0.6, zorder=0)
+                for side in ("top", "right"):
+                    ax.spines[side].set_visible(False)
+                ax.set_title(f"{title}, target recall {int(target) / 100:.2f}", fontsize=10)
                 ax.set_xticks(range(len(BANDS)))
-                ax.set_xticklabels(BANDS, fontsize=7)
+                ax.set_xticklabels(BANDS, fontsize=8)
                 if j == 0:
-                    ax.set_ylabel("Queries per second", fontsize=9)
+                    ax.set_ylabel("Throughput (QPS)", fontsize=9)
                 if i == len(present) - 1:
                     ax.set_xlabel("Vectors that match the filter", fontsize=9)
-    axes[0][0].legend(frameon=False, fontsize=8)
-    fig.tight_layout()
-    fig.savefig(f"{results}/throughput_by_band.svg")
+    handles, labels = axes[0][0].get_legend_handles_labels()
+    if any(row.get(s, 0) is None for key, _ in present for row in summarize(f"{results}/{key}") for s in SYSTEMS):
+        handles.append(plt.Line2D([], [], marker="x", color="#55585E", linestyle="none", markersize=6, markeredgewidth=1.6))
+        labels.append("Recall of KuroANN not reached")
+    fig.legend(handles, labels, loc="upper center", ncol=4, frameon=False, fontsize=9, bbox_to_anchor=(0.5, 1.0))
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.savefig(f"{results}/throughput_by_band.svg", facecolor="white")
 
 
 if __name__ == "__main__":

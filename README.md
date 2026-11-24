@@ -5,7 +5,7 @@
 <h1 align="center">KuroANN</h1>
 
 <p align="center">
-  <b>Filtered vector search on SSDs that sets how much each query reads from its match count.</b>
+  <b>Filtered vector search on SSDs, built to avoid unnecessary SSD reads.</b>
 </p>
 
 <p align="center">
@@ -24,10 +24,12 @@
 KuroANN is an approximate nearest neighbor (ANN) search system for embedding vectors with filters, such as "reviews since
 2020" or "kitchen items under $50". The raw vectors stay on an SSD, and memory holds a compressed code of each vector.
 
-A filter that matches few vectors and a filter that matches most of them need very different searches. KuroANN knows the
-match count of every query before its first SSD read, because its lists of matching vectors are sorted by position in
-the index. A small table, called the plan, turns that count into how widely the query searches and when it stops reading.
-Calibration measures each row of the plan on sample queries, against a recall target.
+KuroANN aims to keep each query from reading more from the SSD than its filter needs. Partition-based systems usually give
+all queries in a selectivity range the same search budget, sized for the query that needs the most, so many queries read
+candidates that do not change their answer. KuroANN instead sets the reads of each query from its match count, the number of
+vectors that pass its filter. It knows this count before the first SSD read, because its lists of matching vectors are sorted
+by position in the index. A small table, called the plan, turns the count into how widely the query searches and when it
+stops reading. Calibration measures each row of the plan on sample queries, against a recall target.
 
 ## How it works
 
@@ -65,55 +67,12 @@ baseline gets its fastest setting whose recall is at least that recall, and "not
 there. The testbed is one CloudLab c6620 machine (Intel Xeon Gold 5512U with 28 cores, 128 GB of memory, Dell DC NVMe 7450 SSD)
 with 28 search threads.
 
-### PubMed
+<p align="center"><img src="assets/results.svg" width="900" alt="Throughput of KuroANN, PipeANN-Filter, and Faiss-SSD on PubMed and Amazon at target recall 0.90, 0.95, and 0.99, for six ranges of the fraction of vectors that match the filter."></p>
 
-| Filter matches | Target | KuroANN recall | KuroANN QPS | PipeANN-Filter QPS | Faiss-SSD QPS |
-|---|---:|---:|---:|---:|---:|
-| <0.01% | 0.90 | 0.9626 | 15,988 | 1,712 | 5,110 |
-| <0.01% | 0.95 | 0.9626 | 15,807 | 1,712 | 5,110 |
-| <0.01% | 0.99 | 0.9918 | 9,701 | 667 | 4,935 |
-| 0.01–0.1% | 0.90 | 0.9105 | 8,565 | 1,503 | 2,352 |
-| 0.01–0.1% | 0.95 | 0.9627 | 7,528 | 882 | 2,352 |
-| 0.01–0.1% | 0.99 | 0.9907 | 4,952 | 340 | 2,211 |
-| 0.1–1% | 0.90 | 0.9099 | 2,945 | 902 | 671 |
-| 0.1–1% | 0.95 | 0.9596 | 1,590 | 828 | 661 |
-| 0.1–1% | 0.99 | 0.9948 | 1,441 | 268 | 640 |
-| 1–5% | 0.90 | 0.9007 | 1,471 | 313 | 423 |
-| 1–5% | 0.95 | 0.9632 | 472 | 260 | 228 |
-| 1–5% | 0.99 | 0.9925 | 462 | 258 | 225 |
-| 5–20% | 0.90 | 0.9190 | 985 | 49 | 448 |
-| 5–20% | 0.95 | 0.9635 | 507 | 43 | 231 |
-| 5–20% | 0.99 | 0.9929 | 110 | 43 | 57 |
-| >20% | 0.90 | 0.9074 | 1,204 | 871 | 576 |
-| >20% | 0.95 | 0.9490 | 601 | 740 | 361 |
-| >20% | 0.99 | 0.9907 | 159 | 139 | 88 |
-
-### Amazon
-
-| Filter matches | Target | KuroANN recall | KuroANN QPS | PipeANN-Filter QPS | Faiss-SSD QPS |
-|---|---:|---:|---:|---:|---:|
-| <0.01% | 0.90 | 0.9196 | 11,649 | 1,320 | 870 |
-| <0.01% | 0.95 | 0.9587 | 7,131 | 1,049 | 863 |
-| <0.01% | 0.99 | 0.9930 | 2,310 | 478 | 849 |
-| 0.01–0.1% | 0.90 | 0.9427 | 5,790 | 1,159 | 947 |
-| 0.01–0.1% | 0.95 | 0.9768 | 2,945 | 702 | 926 |
-| 0.01–0.1% | 0.99 | 0.9945 | 1,063 | 190 | 542 |
-| 0.1–1% | 0.90 | 0.9236 | 2,595 | 361 | 859 |
-| 0.1–1% | 0.95 | 0.9623 | 1,626 | 278 | 736 |
-| 0.1–1% | 0.99 | 0.9917 | 722 | 93 | 472 |
-| 1–5% | 0.90 | 0.9059 | 2,069 | 144 | 870 |
-| 1–5% | 0.95 | 0.9478 | 1,105 | 131 | 763 |
-| 1–5% | 0.99 | 0.9925 | 306 | not reached | 274 |
-| 5–20% | 0.90 | 0.8927 | 1,419 | 103 | 947 |
-| 5–20% | 0.95 | 0.9501 | 693 | 56 | 510 |
-| 5–20% | 0.99 | 0.9936 | 171 | 44 | 69 |
-| >20% | 0.90 | 0.9103 | 1,454 | 87 | 677 |
-| >20% | 0.95 | 0.9577 | 680 | 32 | 516 |
-| >20% | 0.99 | 0.9934 | 207 | not reached | 69 |
-
-KuroANN is faster than both baselines in 35 of the 36 cells, by 1.1 to 8.8 times over the faster of the two. The exception
-is PubMed filters that match more than 20% of the vectors at target 0.95, where PipeANN-Filter is 1.23 times faster. The plans
-reach their target in 33 of the 36 cells and fall short by at most 0.0073 in the other three.
+In these runs, KuroANN was faster than both baselines in 35 of the 36 cells, by 1.1 to 8.8 times over the faster of the two.
+The exception was PubMed filters that match more than 20% of the vectors at target 0.95, where PipeANN-Filter was 1.23 times
+faster. The plans reached their target in 33 of the 36 cells and fell short by at most 0.0073 in the other three.
+`assets/results.csv` lists every cell with the recall of KuroANN, and `scripts/plot.py` draws the figure from the measurements.
 
 ## Demo
 
@@ -175,9 +134,9 @@ python3 scripts/calibrate.py --index idx/pubmed --queries sample.fbin --filters 
     --out plan/pubmed --kuroann build/kuroann --targets 0.9,0.95,0.99
 ```
 
-The sample queries should resemble the real ones and cover the filter widths you expect. A few thousand are enough. The script
-computes their exact answers, measures stop tables, sweeps settings with the engine, and writes `plan_90.txt`, `plan_95.txt`, and
-`plan_99.txt`. Run it alone on the machine, because the sweep measures throughput.
+The sample queries should resemble the real ones and cover the filter widths you expect. A few thousand were enough for the
+datasets above. The script computes their exact answers, measures stop tables, sweeps settings with the engine, and writes
+`plan_90.txt`, `plan_95.txt`, and `plan_99.txt`. Run it alone on the machine, because the sweep measures throughput.
 
 ### Search
 
@@ -202,9 +161,9 @@ build/kuroann update --index idx/labels --insert new.fbin --insert-labels new.sp
 ```
 
 New vectors take the next ids and go to a delta segment of their partition, and removals set a tombstone. Both take effect at
-once and change the counts that the plan reads, so random inserts and removals need no new plan. A merge moves the delta segment
-into the packed arrays, in the order of a fresh build, and drops the removed vectors. The command above also merges and saves.
-Updates must not overlap searches on the same index.
+once and change the counts that the plan reads, so random inserts and removals usually do not need a new plan. A merge moves
+the delta segment into the packed arrays, in the order of a fresh build, and drops the removed vectors. The command above also
+merges and saves. Updates must not overlap searches on the same index.
 
 ### From C++
 
@@ -273,7 +232,7 @@ PYTHON=venv/bin/python scripts/reproduce.sh
 ```
 
 The script downloads the data, embeds the Amazon items, builds the indexes, computes the exact answers, calibrates the plans,
-and measures. It writes `results/summary.csv` and `results/throughput_by_band.svg`. A finished step is kept, so a run that
+and measures. It writes `results/summary.csv` and `results/throughput_by_band.svg`, the table and the figure of the results above. A finished step is kept, so a run that
 stopped continues from where it stopped. `DATASETS`, `SYSTEMS`, and `THREADS` choose a part of the work. `LIMIT=200000` builds
 and measures a sample of about 200,000 vectors per dataset, but the NLM records and the Amazon metadata are still downloaded in
 full. The downloads are pinned to the versions measured here, except the NLM baseline, which NLM replaces every December.
