@@ -5,8 +5,8 @@ const TARGETS = ["0.9", "0.95", "0.99"];
 
 const EN = {
   tag: "Filtered vector search demo",
-  h1: "Filtered vector search that knows how much to read before its first SSD read",
-  lede: "A filter can match a handful of vectors or most of them, and each case needs a different search. {sys} counts the matches of every query before it reads the SSD, then uses that count to set how widely to search and when to stop. Pick a query to replay a recorded lookup and compare it with other SSD systems at the same recall.",
+  h1: "Filtered vector search, built to avoid unnecessary SSD reads",
+  lede: "When every query gets the same search budget, many queries read candidates from the SSD that do not change their answer. {sys} counts the matches of every query before it reads the SSD, and uses that count to set how much the query reads and when it stops. Pick a query to replay a recorded lookup and compare it with other SSD systems at the same recall.",
   tabSearch: "Semantic search",
   tabRec: "Recommendation",
   tabRag: "RAG",
@@ -30,7 +30,7 @@ const EN = {
   routeAllShop: "ranked every match by its code",
   routePartsShop: "ranked the matches in the {p} nearest partitions",
   tooFew: "fewer than 10",
-  speedNote: "Times are of this one lookup, alone on the server. QPS is the throughput of each system on all filters that match {b} of the products, with 28 threads.",
+  speedNote: "Times are of this one lookup, alone on the server. QPS is the throughput of each system on all filters that match {b} of the products.",
   loadLabel: "Server load, queries per second",
   loadIdle: "Idle",
   loadNoteIdle: "The lookup alone on the server.",
@@ -74,7 +74,7 @@ const EN = {
   mRankAll: "Rank all {c} matches by their codes in memory and keep the best {pool}.",
   mRankParts: "Rank the matches in the {p} nearest of {n} partitions by their codes in memory and keep the best {pool}.",
   mGrid: "one cell is {k} partitions",
-  mReadStop: "Read {r} of the {pool} candidates from the SSD, best estimate first, and stop once no unread candidate can beat the 10th best.",
+  mReadStop: "Read {r} of the {pool} candidates from the SSD, best estimate first, and stop once no unread candidate is likely to beat the 10th best.",
   mReadAll: "Read the {pool} candidates from the SSD, best estimate first.",
   times: "{x}\u00d7",
   glanceQps: "more queries per second than the fastest other system",
@@ -98,8 +98,8 @@ const EN = {
   resultsRag: "Abstracts the answer draws on",
   capH: "Throughput by filter width",
   capLede: "Queries per second on the whole workload, in bands by the share of vectors that a filter matches. {sys} runs its plan for the recall target, and each other system runs at its fastest setting that reaches the recall {sys} achieves on the band.",
-  capFoot: "Queries per second, on a log scale. All systems run on the same machine with the same queries and 28 threads, and they use the same SSD for their files.",
-  ragFoot: "The answer comes from Llama-3.1-8B-Instruct. Its times are computed from rates measured with vLLM on an NVIDIA A30: {a} ms plus {b} ms per prompt token, and {d} tokens per second. Embedding and search times are measured.",
+  capFoot: "Queries per second, on a log scale. All systems run on the same machine with the same queries, and they use the same SSD for their files.",
+  ragFoot: "The answer comes from Llama-3.1-8B-Instruct. Its times are estimated from rates measured separately with vLLM. Embedding and search times are measured.",
   footer: "This page replays recorded lookups. Recall is measured against the exact filtered answer, and vectors tied with the 10th nearest count as found.",
   themeDark: "Dark",
   themeLight: "Light",
@@ -775,7 +775,7 @@ function selectTab(tab) {
 async function start() {
   const params = new URLSearchParams(location.search);
   lang = params.get("lang") === "ko" ? "ko" : "en";
-  DATA = window.DEMO_DATA || (await (await fetch("data.json?v=b08d3eb252")).json());
+  DATA = window.DEMO_DATA || (await (await fetch("data.json?v=00c1646b04")).json());
   KO = DATA.ko || {};
   applyStatic();
   renderGlance();
