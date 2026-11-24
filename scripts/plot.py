@@ -66,7 +66,7 @@ def main():
     results = sys.argv[1]
     present = [(key, title) for key, title in DATASETS if os.path.exists(f"{results}/{key}/kuroann.jsonl")]
     plt.rcParams.update({"font.family": ["Helvetica", "Arial", "DejaVu Sans"], "svg.fonttype": "path"})
-    fig, axes = plt.subplots(len(present), 3, figsize=(12, 2.9 * len(present)), squeeze=False, sharex=True, sharey="row")
+    fig, axes = plt.subplots(len(present), 3, figsize=(12, 3.6 * len(present)), squeeze=False, sharey="row")
     width = 0.27
     with open(f"{results}/summary.csv", "w", newline="") as f:
         w = csv.writer(f)
@@ -100,18 +100,18 @@ def main():
                 ax.grid(True, axis="y", which="major", color="#E3E3E0", linewidth=0.6, zorder=0)
                 for side in ("top", "right"):
                     ax.spines[side].set_visible(False)
-                ax.set_title(f"{title}, target recall {int(target) / 100:.2f}", fontsize=10)
+                ax.set_title(f"{title}, target recall {int(target) / 100:.2f}", fontsize=12)
                 ax.set_xticks(range(len(BANDS)))
-                ax.set_xticklabels(BANDS, fontsize=8)
+                ax.set_xticklabels([b.replace("%", "") for b in BANDS], fontsize=10)
+                ax.tick_params(axis="y", labelsize=12)
                 if j == 0:
-                    ax.set_ylabel("Throughput (QPS)", fontsize=9)
-                if i == len(present) - 1:
-                    ax.set_xlabel("Vectors that match the filter", fontsize=9)
+                    ax.set_ylabel("Throughput (QPS)", fontsize=11)
+                ax.set_xlabel("Vectors that match the filter (%)", fontsize=11)
     handles, labels = axes[0][0].get_legend_handles_labels()
     if any(row.get(s, 0) is None for key, _ in present for row in summarize(f"{results}/{key}") for s in SYSTEMS):
         handles.append(plt.Line2D([], [], marker="x", color="#55585E", linestyle="none", markersize=6, markeredgewidth=1.6))
         labels.append("Recall of KuroANN not reached")
-    fig.legend(handles, labels, loc="upper center", ncol=4, frameon=False, fontsize=9, bbox_to_anchor=(0.5, 1.0))
+    fig.legend(handles, labels, loc="upper center", ncol=4, frameon=False, fontsize=11, bbox_to_anchor=(0.5, 1.0))
     fig.tight_layout(rect=(0, 0, 1, 0.95))
     fig.savefig(f"{results}/throughput_by_band.svg", facecolor="white")
 
