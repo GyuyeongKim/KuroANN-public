@@ -1,30 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="940" height="334" viewBox="0 0 940 334" role="img" aria-labelledby="t">
   <title id="t">A query and its filter go to the postings, which give the match count before any read. The count picks a row of the plan. The row sets the route and the pool of PQ codes to rank in memory. Reads go from the best estimate down and stop once no unread candidate is likely to beat the k-th best.</title>
   <style>
-    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: #15161A; }
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: #17151C; }
     .h { font-size: 14px; font-weight: 600; }
     .s { font-size: 12.5px; }
     .m { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
-    .band { font-size: 12px; font-weight: 600; fill: #A85D00; letter-spacing: 0.04em; }
-    .box { fill: #FFFFFF; stroke: #B5B7BB; stroke-width: 1.2; }
-    .row { fill: #FBF0E1; }
-    .arrow { stroke: #A85D00; stroke-width: 1.6; fill: none; marker-end: url(#a); }
+    .band { font-size: 12px; font-weight: 600; fill: #7A45B5; letter-spacing: 0.04em; }
+    .box { fill: #FFFFFF; stroke: #B8B4C0; stroke-width: 1.2; }
+    .row { fill: #F2EBFB; }
+    .arrow { stroke: #7A45B5; stroke-width: 1.6; fill: none; marker-end: url(#a); }
     @media (prefers-color-scheme: dark) {
-      text { fill: #EDEDEB; }
-      .band { fill: #F0A43A; }
-      .box { fill: #1C1D21; stroke: #4B4E54; }
-      .row { fill: #2C2316; }
-      .bg { fill: #121316; stroke: #2B2D31; }
-      .bg2 { fill: #17181B; stroke: #2B2D31; }
-      .arrow { stroke: #F0A43A; }
-      #a path { fill: #F0A43A; }
+      text { fill: #EEEDF1; }
+      .band { fill: #F7A1C9; }
+      .box { fill: #1D1A22; stroke: #4D4756; }
+      .row { fill: #2E2232; }
+      .bg { fill: #131117; stroke: #2D2934; }
+      .bg2 { fill: #1E1B24; stroke: #2D2934; }
+      .arrow { stroke: #F7A1C9; }
+      #a path { fill: #F7A1C9; }
     }
   </style>
-  <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#A85D00"/></marker></defs>
+  <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#7A45B5"/></marker></defs>
 
-  <rect class="bg" x="8" y="8" width="924" height="216" rx="10" fill="#F6F6F4" stroke="#E3E3E0"/>
+  <rect class="bg" x="8" y="8" width="924" height="216" rx="10" fill="#F6F5F8" stroke="#E5E3E9"/>
   <text class="band" x="24" y="30">IN MEMORY</text>
-  <rect class="bg2" x="408" y="236" width="524" height="90" rx="10" fill="#F3F3F1" stroke="#E3E3E0"/>
+  <rect class="bg2" x="408" y="236" width="524" height="90" rx="10" fill="#F4F3F6" stroke="#E5E3E9"/>
   <text class="band" x="424" y="254">ON THE SSD</text>
 
   <rect class="box" x="24" y="44" width="172" height="164" rx="8"/>

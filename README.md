@@ -9,9 +9,9 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-2A2B30?style=flat-square" alt="License: Apache-2.0"></a>
-  <img src="https://img.shields.io/badge/storage-NVMe%20SSD%20%7C%20io__uring-A85D00?style=flat-square" alt="Storage: NVMe SSD with io_uring">
-  <img src="https://img.shields.io/badge/language-C%2B%2B%20%7C%20Python-5B6573?style=flat-square" alt="Language: C++ and Python">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-1E1B24?style=flat-square" alt="License: Apache-2.0"></a>
+  <img src="https://img.shields.io/badge/storage-NVMe%20SSD%20%7C%20io__uring-7A45B5?style=flat-square" alt="Storage: NVMe SSD with io_uring">
+  <img src="https://img.shields.io/badge/language-C%2B%2B%20%7C%20Python-4B3B63?style=flat-square" alt="Language: C++ and Python">
 </p>
 
 <p align="center">

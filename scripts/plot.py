@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 DATASETS = [("pubmed", "PubMed-24M"), ("amazon", "Amazon-35M")]
 BANDS = ["<0.01%", "0.01–0.1%", "0.1–1%", "1–5%", "5–20%", ">20%"]
 TARGETS = ["90", "95", "99"]
-SYSTEMS = {"kuroann": ("KuroANN", "#E08A1E", ""), "pipeann-filter": ("PipeANN-Filter", "#2B2D31", ""), "faiss-ssd": ("Faiss-SSD", "#9AA0A8", "")}
+SYSTEMS = {"kuroann": ("KuroANN", "#E879B0", ""), "pipeann-filter": ("PipeANN-Filter", "#1E1B24", ""), "faiss-ssd": ("Faiss-SSD", "#B4ACC2", "")}
 
 
 def bands_of(path):
@@ -97,7 +97,7 @@ def main():
                 ax.set_ylim(low / 2, high * 1.6)
                 ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:,.0f}"))
                 ax.yaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
-                ax.grid(True, axis="y", which="major", color="#E3E3E0", linewidth=0.6, zorder=0)
+                ax.grid(True, axis="y", which="major", color="#E5E3E9", linewidth=0.6, zorder=0)
                 for side in ("top", "right"):
                     ax.spines[side].set_visible(False)
                 ax.set_title(f"{title}, target recall {int(target) / 100:.2f}", fontsize=12)
@@ -109,7 +109,7 @@ def main():
                 ax.set_xlabel("Vectors that match the filter (%)", fontsize=11)
     handles, labels = axes[0][0].get_legend_handles_labels()
     if any(row.get(s, 0) is None for key, _ in present for row in summarize(f"{results}/{key}") for s in SYSTEMS):
-        handles.append(plt.Line2D([], [], marker="x", color="#55585E", linestyle="none", markersize=6, markeredgewidth=1.6))
+        handles.append(plt.Line2D([], [], marker="x", color="#4B3B63", linestyle="none", markersize=6, markeredgewidth=1.6))
         labels.append("Recall of KuroANN not reached")
     fig.legend(handles, labels, loc="upper center", ncol=4, frameon=False, fontsize=11, bbox_to_anchor=(0.5, 1.0))
     fig.tight_layout(rect=(0, 0, 1, 0.95))
