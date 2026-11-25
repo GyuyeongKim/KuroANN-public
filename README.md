@@ -9,6 +9,7 @@
 </p>
 
 <p align="center">
+  <a href="https://arxiv.org/abs/2611.32908"><img src="https://img.shields.io/badge/arXiv-2611.32908-7A45B5?style=flat-square" alt="arXiv: 2611.32908"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-1E1B24?style=flat-square" alt="License: Apache-2.0"></a>
   <img src="https://img.shields.io/badge/storage-NVMe%20SSD%20%7C%20io__uring-7A45B5?style=flat-square" alt="Storage: NVMe SSD with io_uring">
   <img src="https://img.shields.io/badge/language-C%2B%2B%20%7C%20Python-4B3B63?style=flat-square" alt="Language: C++ and Python">
@@ -16,7 +17,7 @@
 
 <p align="center">
   <a href="#how-it-works">How it works</a> · <a href="#results">Results</a> · <a href="#demo">Demo</a> · <a href="#quick-start">Quick start</a> · <a href="#usage">Usage</a> ·
-  <a href="#file-formats">File formats</a> · <a href="#reproducing-the-results">Reproducing the results</a> · <a href="#tests">Tests</a> · <a href="#source-tree">Source tree</a>
+  <a href="#file-formats">File formats</a> · <a href="#reproducing-the-results">Reproducing the results</a> · <a href="#tests">Tests</a> · <a href="#source-tree">Source tree</a> · <a href="#citation">Citation</a>
 </p>
 
 ---
@@ -30,6 +31,9 @@ candidates that do not change their answer. KuroANN instead sets the reads of ea
 vectors that pass its filter. It knows this count before the first SSD read, because its lists of matching vectors are sorted
 by position in the index. A small table, called the plan, turns the count into how widely the query searches and when it
 stops reading. Calibration measures each row of the plan on sample queries, against a recall target.
+
+The paper, [KuroANN: Avoiding Unnecessary SSD Reads in High-Recall Filtered Vector Search](https://arxiv.org/abs/2611.32908),
+describes the design and its evaluation.
 
 ## How it works
 
@@ -265,6 +269,22 @@ baselines/                 PipeANN-Filter patch, Faiss-SSD, and the benchmark dr
 tests/                     checks against a brute-force oracle
 examples/                  synthetic data and quick start
 assets/                    logo and figures
+```
+
+## Citation
+
+If you use KuroANN in your work, please cite the paper:
+
+```bibtex
+@misc{cho2026kuroann,
+  title         = {KuroANN: Avoiding Unnecessary SSD Reads in High-Recall Filtered Vector Search},
+  author        = {Soobin Cho and Nakyung Lee and Jiwoong Park and Gyuyeong Kim},
+  year          = {2026},
+  eprint        = {2611.32908},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.OS},
+  url           = {https://arxiv.org/abs/2611.32908}
+}
 ```
 
 ## License and contact
